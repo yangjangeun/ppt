@@ -18,7 +18,7 @@ st.markdown('''
 
 
 # 1. 입력
-content = st.text_area("문장을 복사해서 넣으면 요약해서 PPT로 만들어 줌...", height=200)
+content = st.text_area("문장을 복사해서 넣으면 요약해서 PPT로 만들어 줌(만들고 싶은 페이지수 선택)", height=200)
 
 col1, col2 = st.columns([1, 1])
 with col1:
