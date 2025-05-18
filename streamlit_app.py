@@ -11,20 +11,6 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("PPT 자동 생성기 (Streamlit)")
 
-st.markdown('''
-**❗️아래 예시처럼 반드시 번호+제목+내용 구조로 입력해야 합니다!**
-
-예시:
-1. 사업의 필요성
-사업의 필요성에 대한 내용
-
-2. 사업의 개요
-사업의 개요에 대한 내용
-
-3. 기대효과
-기대효과에 대한 내용
-''')
-
 st.markdown("문장을 복사해서 넣으면 요약해 PPT로 만들어줌 (만들고 싶은 페이지 수 선택)")
 
 content = st.text_area("PPT로 만들고 싶은 내용을 입력하세요...", height=200)
