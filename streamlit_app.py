@@ -51,7 +51,7 @@ if make_summary:
         slides_content.append({'title': title.strip(), 'content': summary})
 
     st.session_state['slides_content'] = slides_content
-    st.session_state['page_count'] = page_count
+    # st.session_state['page_count'] = page_count  # 이 줄은 삭제!
 
 # 3. 슬라이드별 미리보기/수정
 if 'slides_content' in st.session_state:
@@ -61,9 +61,6 @@ if 'slides_content' in st.session_state:
         title = st.text_input(f"슬라이드 {i+1} 제목", value=slide['title'], key=f"title_{i}")
         body = st.text_area(f"슬라이드 {i+1} 내용", value=slide['content'], key=f"body_{i}")
         edited_slides.append({'title': title, 'content': body})
-
-    # 페이지 수는 세션에서 불러오기
-    page_count = st.session_state.get('page_count', len(edited_slides))
 
     # 4. PPT 생성
     if st.button("PPT 생성"):
