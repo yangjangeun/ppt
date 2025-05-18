@@ -16,12 +16,9 @@ st.markdown('''
 내용을 단락락별로 번호로 구분해서 정리해서 넣기 (예: 1. 사업의 필요성 2. 사업의 개요 ... 5. 기대효과 형태로)
 ''')
 
-st.markdown("""
-**내용 입력**  
-""")
 
 # 1. 입력
-content = st.text_area("PPT로 만들고 싶은 내용을 입력하세요...", height=200)
+content = st.text_area("PPT로 만들고 싶은 내용을 아래에 입력하세요...", height=200)
 
 col1, col2 = st.columns([1, 1])
 with col1:
