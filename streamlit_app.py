@@ -9,8 +9,8 @@ import re
 # OpenAI 라이브러리
 import openai
 
-# secrets에서 API 키 불러오기
-openai_api_key = st.secrets["openai"]["api_key"]
+# secrets에서 API 키 불러오기 (대문자, 언더바, 대괄호 없이)
+openai_api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("PPT 자동 생성기 (Streamlit)")
 
