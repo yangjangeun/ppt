@@ -7,18 +7,27 @@ import textwrap
 import re
 import openai
 
-# OpenAI API 키를 secrets에서 불러오기
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-st.title("PPT 자동 생성기")
+st.title("PPT 자동 생성기 (Streamlit)")
 
 st.markdown('''
-**내용을 단락별로 번호로 구분해서 넣기 (예: 1. 사업의 필요성 2. 사업의 개요 ... 5. 기대효과 형태로)
+**❗️아래 예시처럼 반드시 번호+제목+내용 구조로 입력해야 합니다!**
+
+예시:
+1. 사업의 필요성
+사업의 필요성에 대한 내용
+
+2. 사업의 개요
+사업의 개요에 대한 내용
+
+3. 기대효과
+기대효과에 대한 내용
 ''')
 
+st.markdown("문장을 복사해서 넣으면 요약해 PPT로 만들어줌 (만들고 싶은 페이지 수 선택)")
 
-# 1. 입력
-content = st.text_area("문장을 복사해서 넣으면 요약해서 PPT로 만들어 줌  (만들고 싶은 페이지수 선택)", height=200)
+content = st.text_area("PPT로 만들고 싶은 내용을 입력하세요...", height=200)
 
 col1, col2 = st.columns([1, 1])
 with col1:
@@ -26,14 +35,12 @@ with col1:
 with col2:
     make_summary = st.button("요약 생성")
 
-# 2. 요약 생성 버튼
+# 슬라이드 분할 및 요약
 if make_summary:
-    # 슬라이드별로 분할 (번호. 제목\n내용)
     items = re.findall(r'(\d+)\.\s*([^\n]+)\n([^\n]+(?:\n(?!\d+\.).+)*)', content, re.MULTILINE)
     slides_content = []
     client = openai.OpenAI(api_key=openai_api_key)
     for idx, title, item_content in items:
-        # OpenAI로 요약
         prompt = f"다음 내용을 2~3줄의 bullet point로 요약해줘:\n{item_content.strip()}"
         try:
             response = client.chat.completions.create(
@@ -47,24 +54,28 @@ if make_summary:
             summary = f"(요약 실패: {e})\n{item_content.strip()}"
         slides_content.append({'title': title.strip(), 'content': summary})
 
-    # 페이지 수에 맞게 슬라이드 그룹핑
-    def group_sections_by_page(sections, page_count):
-        n = len(sections)
-        base = n // page_count
-        extra = n % page_count
-        grouped = []
-        idx = 0
-        for i in range(page_count):
-            count = base + (1 if i < extra else 0)
-            grouped.append(sections[idx:idx+count])
-            idx += count
-        return grouped
+    # 슬라이드가 1개도 없으면 경고만 띄우고, 미리보기는 안 보이게!
+    if not slides_content:
+        st.session_state['grouped_slides'] = None
+        st.error("❗️입력한 내용에서 번호(1. 2. 3. ...)로 구분된 슬라이드가 없습니다.\n\n아래 예시처럼 반드시 번호+제목+내용 구조로 입력해 주세요!\n\n예시:\n1. 사업의 필요성\n사업의 필요성에 대한 내용\n\n2. 사업의 개요\n사업의 개요에 대한 내용\n\n3. 기대효과\n기대효과에 대한 내용")
+    else:
+        def group_sections_by_page(sections, page_count):
+            n = len(sections)
+            base = n // page_count
+            extra = n % page_count
+            grouped = []
+            idx = 0
+            for i in range(page_count):
+                count = base + (1 if i < extra else 0)
+                grouped.append(sections[idx:idx+count])
+                idx += count
+            return grouped
 
-    grouped_slides = group_sections_by_page(slides_content, int(page_count))
-    st.session_state['grouped_slides'] = grouped_slides
+        grouped_slides = group_sections_by_page(slides_content, int(page_count))
+        st.session_state['grouped_slides'] = grouped_slides
 
-# 3. 페이지별 미리보기/수정
-if 'grouped_slides' in st.session_state:
+# 페이지별 미리보기 및 수정 (슬라이드가 있을 때만!)
+if 'grouped_slides' in st.session_state and st.session_state['grouped_slides']:
     st.markdown("**페이지별 내용 미리보기 및 수정**")
     edited_grouped_slides = []
     for page_idx, group in enumerate(st.session_state['grouped_slides']):
@@ -76,14 +87,12 @@ if 'grouped_slides' in st.session_state:
             edited_group.append({'title': title, 'content': body})
         edited_grouped_slides.append(edited_group)
 
-    # 4. PPT 생성
     if st.button("PPT 생성"):
         prs = Presentation()
         for group in edited_grouped_slides:
             slide = prs.slides.add_slide(prs.slide_layouts[6])
             y_offset = 0.5
             for slide_content in group:
-                # 제목
                 title_shape = slide.shapes.add_textbox(Inches(0.7), Inches(y_offset), Inches(6.5), Inches(1))
                 title_frame = title_shape.text_frame
                 title_frame.clear()
@@ -93,7 +102,6 @@ if 'grouped_slides' in st.session_state:
                 p_title.font.bold = True
                 p_title.alignment = PP_ALIGN.LEFT
                 y_offset += 1
-                # 내용
                 content_shape = slide.shapes.add_textbox(Inches(0.7), Inches(y_offset), Inches(6.5), Inches(3.5))
                 content_frame = content_shape.text_frame
                 content_frame.clear()
