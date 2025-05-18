@@ -25,7 +25,7 @@ content = st.text_area("PPT로 만들고 싶은 내용을 입력하세요...", h
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    page_count = st.number_input("페이지 수", min_value=1, value=5, step=1, key="page_count")
+    page_count = st.number_input("페이지 수", min_value=1, value=3, step=1, key="page_count")
 with col2:
     make_summary = st.button("요약 생성")
 
@@ -50,37 +50,39 @@ if make_summary:
             summary = f"(요약 실패: {e})\n{item_content.strip()}"
         slides_content.append({'title': title.strip(), 'content': summary})
 
-    st.session_state['slides_content'] = slides_content
-    # st.session_state['page_count'] = page_count  # 이 줄은 삭제!
+    # 페이지 수에 맞게 슬라이드 그룹핑
+    def group_sections_by_page(sections, page_count):
+        n = len(sections)
+        base = n // page_count
+        extra = n % page_count
+        grouped = []
+        idx = 0
+        for i in range(page_count):
+            count = base + (1 if i < extra else 0)
+            grouped.append(sections[idx:idx+count])
+            idx += count
+        return grouped
 
-# 3. 슬라이드별 미리보기/수정
-if 'slides_content' in st.session_state:
-    st.markdown("**슬라이드별 내용 미리보기 및 수정**")
-    edited_slides = []
-    for i, slide in enumerate(st.session_state['slides_content']):
-        title = st.text_input(f"슬라이드 {i+1} 제목", value=slide['title'], key=f"title_{i}")
-        body = st.text_area(f"슬라이드 {i+1} 내용", value=slide['content'], key=f"body_{i}")
-        edited_slides.append({'title': title, 'content': body})
+    grouped_slides = group_sections_by_page(slides_content, int(page_count))
+    st.session_state['grouped_slides'] = grouped_slides
+
+# 3. 페이지별 미리보기/수정
+if 'grouped_slides' in st.session_state:
+    st.markdown("**페이지별 내용 미리보기 및 수정**")
+    edited_grouped_slides = []
+    for page_idx, group in enumerate(st.session_state['grouped_slides']):
+        st.markdown(f"---\n### 페이지 {page_idx+1}")
+        edited_group = []
+        for slide_idx, slide in enumerate(group):
+            title = st.text_input(f"페이지 {page_idx+1} - 슬라이드 {slide_idx+1} 제목", value=slide['title'], key=f"title_{page_idx}_{slide_idx}")
+            body = st.text_area(f"페이지 {page_idx+1} - 슬라이드 {slide_idx+1} 내용", value=slide['content'], key=f"body_{page_idx}_{slide_idx}")
+            edited_group.append({'title': title, 'content': body})
+        edited_grouped_slides.append(edited_group)
 
     # 4. PPT 생성
     if st.button("PPT 생성"):
-        # 페이지 수에 맞게 균등 분할
-        def group_sections_by_page(sections, page_count):
-            n = len(sections)
-            base = n // page_count
-            extra = n % page_count
-            grouped = []
-            idx = 0
-            for i in range(page_count):
-                count = base + (1 if i < extra else 0)
-                grouped.append(sections[idx:idx+count])
-                idx += count
-            return grouped
-
-        grouped_slides = group_sections_by_page(edited_slides, int(page_count))
-
         prs = Presentation()
-        for group in grouped_slides:
+        for group in edited_grouped_slides:
             slide = prs.slides.add_slide(prs.slide_layouts[6])
             y_offset = 0.5
             for slide_content in group:
