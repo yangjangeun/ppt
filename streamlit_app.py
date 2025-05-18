@@ -10,7 +10,7 @@ import openai
 # OpenAI API 키를 secrets에서 불러오기
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-st.title("PPT 자동 생성기 (Streamlit)")
+st.title("PPT 자동 생성기")
 
 st.markdown('''
 **내용을 단락별로 번호로 구분해서 넣기 (예: 1. 사업의 필요성 2. 사업의 개요 ... 5. 기대효과 형태로)
