@@ -54,7 +54,7 @@ if st.button("PPT 생성"):
             p_title.text = slide_content.get('title', '')
             p_title.font.size = Pt(36)
             p_title.font.bold = True
-            p_title.alignment = 0  # LEFT
+            p_title.alignment = PP_ALIGN.LEFT  # 왼쪽 정렬
             y_offset += 1
             # 내용
             content_shape = slide.shapes.add_textbox(Inches(0.7), Inches(y_offset), Inches(6.5), Inches(3.5))
@@ -66,7 +66,7 @@ if st.button("PPT 생성"):
                         p = content_frame.add_paragraph()
                         p.text = wrapped_line
                         p.font.size = Pt(20)
-                        p.alignment = 0  # LEFT
+                        p.alignment = PP_ALIGN.LEFT  # 왼쪽 정렬
             y_offset += 2.5
     ppt_io = io.BytesIO()
     prs.save(ppt_io)
