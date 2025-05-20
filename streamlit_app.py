@@ -11,13 +11,13 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("PPT 자동 생성기")
 
-st.markdown("문장을 복사해서 넣으면 요약해 PPT로 만들어줌 (만들고 싶은 페이지 수 선택)")
+st.markdown("내용을 단락별로만 번호로 구분해서 정리해서 넣기으면 문장들을 요약해서 만들어 줌 (예: 1. 사업의 필요성 2. 사업의 개요 ... 5. 기대효과 형태로)")
 
 content = st.text_area("PPT로 만들고 싶은 내용을 입력하세요...", height=200)
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    page_count = st.number_input("페이지 수", min_value=1, value=3, step=1, key="page_count")
+    page_count = st.number_input("페이지 수 (만들고 싶은 페이지 수 선택)", min_value=1, value=3, step=1, key="page_count")
 with col2:
     make_summary = st.button("요약 생성")
 
