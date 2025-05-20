@@ -9,7 +9,7 @@ import openai
 
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-st.title("PPT 자동 생성기 (Streamlit)")
+st.title("PPT 자동 생성기")
 
 st.markdown("문장을 복사해서 넣으면 요약해 PPT로 만들어줌 (만들고 싶은 페이지 수 선택)")
 
