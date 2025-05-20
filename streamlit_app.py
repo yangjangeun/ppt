@@ -11,8 +11,8 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("PPT 자동 생성기")
 
-st.markdown("내용을 단락별로 번호를 구분해주면 문장들을 요약해서 만들어 줌 (예: 1. 사업의 필요성 2. 사업의 개요 ... 5. 기대효과 형태로)")
-
+st.markdown("내용을 단락별로 번호를 구분해주면 문장들을 요약해서 만들어 줌")
+st.markdown("(예: 1. 사업의 필요성 2. 사업의 개요 ... 5. 기대효과 형태로)")
 content = st.text_area("PPT로 만들고 싶은 내용을 입력하세요...", height=200)
 
 col1, col2 = st.columns([1, 1])
